@@ -1,11 +1,41 @@
 import React from "react";
 import Button from "../button";
 import style from './form.module.scss'
+import { ITask } from "../../types/task";
+import { v4 as uuidv4 } from 'uuid';
 
-class Form extends React.Component {
+class Form extends React.Component<{
+    setTasks: React.Dispatch<React.SetStateAction<ITask[]>>
+}> {
+    state = {
+        taskName: "",
+        taskTime: "00:00"
+    }
+
+    addTask(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        this.props.setTasks(oldTasks =>
+            [
+                ...oldTasks,
+                {
+                    ...this.state,
+                    selected: false,
+                    completed: false,
+                    id: uuidv4(),
+                }
+            ]
+        );
+
+        this.setState({
+            taskName: "",
+            taskTime: "00:00"
+        })
+    }
+
     render(): React.ReactNode {
         return (
-            <form className={style.novaTarefa}>
+            <form className={style.novaTarefa} onSubmit={this.addTask.bind(this)}>
                 <div className={style.inputContainer}>
                     <label htmlFor="tarefa">
                         Adicione um novo estudo
@@ -15,6 +45,10 @@ class Form extends React.Component {
                         name="tarefa"
                         id="tarefa"
                         placeholder="O que você quer estudar"
+                        value={this.state.taskName}
+                        onChange={event => this.setState(
+                            { ...this.state, taskName: event.target.value }
+                        )}
                         required
                     />
                 </div>
@@ -29,10 +63,14 @@ class Form extends React.Component {
                         id="tempo"
                         min="00:00:00"
                         max="01:30:00"
+                        value={this.state.taskTime}
+                        onChange={event => this.setState(
+                            { ...this.state, taskTime: event.target.value }
+                        )}
                         required
                     />
                 </div>
-                <Button>
+                <Button type="submit">
                     Adicionar
                 </Button>
             </form>
